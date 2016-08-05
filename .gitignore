@@ -3,4 +3,5 @@ README.md~
 npm_modules/*
 .settings/*
 node_modules/*
+manifest.yml
 *~

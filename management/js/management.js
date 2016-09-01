@@ -62,6 +62,8 @@ function registerAgent() {
 			organization: organization
 		}),
 		success: function(data) {
+			$("#ip-range").val(null);
+			$("#organization").val(null);
 			loadAgents();
 			showToken(data.token);
 		},
@@ -74,4 +76,8 @@ function registerAgent() {
 function showToken(token) {
 	$("#agent-token").text(token);
 	$("#token-container").show();
+}
+
+function closeTokenDisplay() {
+	$("#token-container").hide();
 }

@@ -29,6 +29,7 @@ body {
 }
 
 .token-display {
+  position: relative;
   background: white;
   width: 600px;
   padding: 30px;
@@ -36,6 +37,18 @@ body {
   padding: 10px 30px;
   margin-top: 250px;
   text-align: center;
+}
+
+.token-display img {
+  position: absolute;
+  width: 35px;
+  padding: 5px;
+  top: 5px;
+  right: 5px;
+}
+
+.token-display img:hover {
+  cursor: pointer;
 }
 
 .token-list-container {

@@ -17,14 +17,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var layer = require('./layer');
+var netbuffer = require('./netbuffer');
+var netproxy = require('./netproxy');
 var type = require('./type');
 var log = require('./log');
 var error = require('./error');
 var rle = require('./rle');
 
 module.exports = {
-	layer : layer,
+	netbuffer : netbuffer,
+	netproxy : netproxy,
 	type : type,
 	log : log,
 	error : error,

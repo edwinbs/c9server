@@ -20,7 +20,8 @@
 var net = require('net');
 var inherits = require('util').inherits;
 var events = require('events');
-var layer = require('../core').layer;
+var netbuffer = require('../core').netbuffer;
+var netproxy = require('../core').netproxy;
 var error = require('../core').error;
 var rle = require('../core').rle;
 var log = require('../core').log;
@@ -82,7 +83,11 @@ function decompress (bitmap) {
 function RdpClient(config) {
 	config = config || {};
 	this.connected = false;
-	this.bufferLayer = new layer.BufferLayer(new net.Socket());
+	if (config.tunnel) {
+		this.bufferLayer = new netproxy.BufferLayer(config.tunnel);
+	} else {
+		this.bufferLayer = new netbuffer.BufferLayer(new net.Socket());
+	}
 	this.tpkt = new TPKT(this.bufferLayer);
 	this.x224 = new x224.Client(this.tpkt);
 	this.mcs = new t125.mcs.Client(this.x224);
@@ -189,7 +194,7 @@ inherits(RdpClient, events.EventEmitter);
 RdpClient.prototype.connect = function (host, port) {
 	log.info('connect to ' + host + ':' + port);
 	var self = this;
-	this.bufferLayer.socket.connect(port, host, function () {
+	this.bufferLayer.connect(port, host, function () {
 		// in client mode connection start from x224 layer
 		self.x224.connect();
 	});

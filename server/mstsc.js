@@ -18,13 +18,28 @@
  */
 
 var rdp = require('../rdp/rdp');
+var TokenStorage = require('../storage/tokenStorage');
 
 var tunnels = {};
 
-function getTunnel(ip) {
-	if (ip.startsWith('9.')) {
-		return tunnels['*'];
+function getTunnel(organization, ip) {
+	if (!organization || !ip || !tunnels[organization]) {
+		console.log('Tunnel not found');
+		return null;
 	}
+
+	var orgTunnels = tunnels[organization];
+	for (var key in orgTunnels) {
+		if (orgTunnels.hasOwnProperty(key)) {
+			if (ip.indexOf(key.substring(0, key.indexOf('*'))) === 0) {
+				console.log('Tunnel for ' + organization + ' with ip range ' + key + ' found');
+				return orgTunnels[key];
+			}
+		}
+	}
+
+	console.log('Tunnel not found');
+	return null;
 }
 
 /**
@@ -35,8 +50,21 @@ module.exports = function (server) {
 	var io = require('socket.io')(server);
 	io.on('connection', function(client) {
 		if (client.handshake.query.isAgent == "true") {
-			console.log('Tunnel connected');
-			tunnels['*'] = client;
+			var agentToken = client.handshake.query.agentToken;
+
+			var tunnelConfig = TokenStorage.getTunelConfigForToken(agentToken);
+			if (!tunnelConfig || !tunnelConfig.organization || !tunnelConfig.ipRange) {
+				client.emit('connection_failed');
+				console.log('[agent_connect] Token not registered');
+			} else {
+				if (!tunnels[tunnelConfig.organization]) {
+					tunnels[tunnelConfig.organization] = {};
+				}
+
+				tunnels[tunnelConfig.organization][tunnelConfig.ipRange] = client;
+				client.emit('connection_succeed');
+				console.log('[agent_connect] Tunnel for ' + tunnelConfig.organization + ' with ip range ' + tunnelConfig.ipRange + ' connected');
+			}
 		} else {
 			var rdpClient = null;
 			client.on('infos', function (infos) {
@@ -45,7 +73,7 @@ module.exports = function (server) {
 					rdpClient.close();
 				};
 
-				var tunnel = getTunnel(infos.ip);
+				var tunnel = getTunnel(infos.organization, infos.ip);
 				console.log('[main] tunnel=' + tunnel);
 				
 				rdpClient = rdp.createClient({

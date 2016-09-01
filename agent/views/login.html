@@ -1,0 +1,226 @@
+<html>
+<head>
+<title>C9Agent</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<style type="text/css">
+
+body {
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+h3 { margin: 0; font-size: 24px;}
+
+a {
+	color: #999;
+	text-decoration: none;
+}
+
+a:hover { color: #1dabb8; }
+
+fieldset {
+	border: none;
+	margin: 0;
+}
+
+input {
+	border: none;
+	font-family: inherit;
+	font-size: inherit;
+	margin: 0;
+	-webkit-appearance: none;
+}
+
+input:focus {
+  outline: none;
+}
+
+input[type="button"] { cursor: pointer; }
+
+.clearfix {
+  *zoom: 1;
+  
+  &:before,
+  &:after {
+    content: ' ';
+    display: table;
+  }
+  
+  &:after {
+    clear: both;
+  }
+  
+}
+
+.container {
+  left: 50%;
+  position: fixed;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ---------- LOGIN-FORM ---------- */
+
+#login-form {
+	width: 400px;
+        margin: 0 auto;
+}
+
+#login-form h3 {
+	background-color: #282830;
+	border-radius: 5px 5px 0 0;
+	color: #fff;
+	font-size: 14px;
+	padding: 20px;
+	text-align: center;
+	text-transform: uppercase;
+}
+
+#login-form fieldset {
+	background: #fff;
+	border-radius: 0 0 5px 5px;
+	padding: 20px;
+	position: relative;
+}
+
+#id_dispmsg {
+	background: #fff;
+	padding: 20px;
+	margin: -4px 0 0 -4px;
+        text-align: center;
+}
+
+#login-form fieldset:before {
+	background-color: #fff;
+	content: "";
+	height: 8px;
+	left: 50%;
+	margin: -4px 0 0 -4px;
+	position: absolute;
+	top: 0;
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	-o-transform: rotate(45deg);
+	transform: rotate(45deg);
+	width: 8px;
+}
+
+#login-form input {
+	font-size: 14px;
+}
+
+#login-form input[type="text"],
+#login-form input[type="password"] {
+	border: 1px solid #dcdcdc;
+	padding: 12px 10px;
+	width: 100%;
+}
+
+#login-form input[type="email"] {
+	border-radius: 3px 3px 0 0;
+}
+
+#login-form input[type="password"] {
+	border-top: none;
+	border-radius: 0px 0px 3px 3px;
+}
+
+#login-form input[type="button"] {
+	background: #1dabb8;
+	border-radius: 3px;
+	color: #fff;
+	font-weight: bold;
+	margin-top: 20px;
+	padding: 12px 20px;
+}
+
+#login-form input[type="button"]:hover { background: #198d98; }
+
+#login-form footer {
+	font-size: 12px;
+	margin-top: 16px;
+}
+
+.info {
+	background: #e5e5e5;
+	border-radius: 50%;
+	display: inline-block;
+	height: 20px;
+	line-height: 20px;
+	margin: 0 10px 0 0;
+	text-align: center;
+	width: 20px;
+}
+
+.heading {
+	text-align: center;
+}
+
+.logo {
+	width: 200px;
+}
+
+</style>
+  <script type="text/javascript">
+function postIVal() {
+  $('#id_dispmsg').hide();
+  var c9server = $('#inputIpAddress').val(), secret = $('#inputSecret').val(), c9port = $('#inputPort').val();
+  if (!c9server || !secret) {
+    $('#id_dispmsg').text("Please Enter the Credentials"); 
+    $('#id_dispmsg').show();
+    return;
+  }
+  $.ajax({
+    url: "/validateSecret",
+    type: "POST",
+    async: false,
+    data: {
+      c9server: c9server,
+      secret: secret,
+    },
+    success: function(data, status, xhr) {
+      console.log(data);
+      var jsonresp = JSON.parse(data); 
+        $('#id_dispmsg').show();
+      if (jsonresp.err) {
+        $('#id_dispmsg').text(jsonresp.err);
+      }
+      else {
+        $('#id_dispmsg').text(jsonresp.data || "");
+        $('#login-form').hide();
+      }
+    }
+  });
+}
+  </script>
+
+
+</head>
+<body>
+
+	<div class='heading'>
+		<img class='logo' src="img/mstsc.js.svg"></img>
+	    <h3>C9 Agent</h3>
+    </div>
+
+  	<div id="login-form">
+    <fieldset>
+
+      <form action="javascript:void(0);">
+        <input type="text" id="inputIpAddress" placeholder="C9 Server IP" required autofocus>
+        <input type="text" id="inputSecret" placeholder="SecretKey" required>
+
+		<div style="text-align:center; ">
+	        <input type="button" onClick="postIVal();return false;" value="Connect">
+		</div>
+      </form>
+
+    </fieldset>
+
+  </div> <!-- end login-form -->
+
+  <p id="id_dispmsg" style="display:none;"></p>
+
+</body>
+</html>
+

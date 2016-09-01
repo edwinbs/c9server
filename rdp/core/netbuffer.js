@@ -65,7 +65,6 @@ inherits(BufferLayer, events.EventEmitter);
  * @param data tcp stream
  */
 BufferLayer.prototype.recv = function(data) {
-	console.log('[buffer] recv');
 	this.buffers[this.buffers.length] = data;
 	this.bufferLength += data.length;
 	
@@ -99,7 +98,6 @@ BufferLayer.prototype.recv = function(data) {
  * @param {type.Type} packet
  */
 BufferLayer.prototype.send = function(data) {
-	console.log('[buffer] send');
 	var s = new type.Stream(data.size());
 	data.write(s);
 	if(this.securePair) {

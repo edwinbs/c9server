@@ -29,13 +29,13 @@
     	client = Mstsc.client.create(Mstsc.$(canvas));
     } 
     
-	function connect (ip, domain, username, password) {
+	function connect (ip, organization, domain, username, password) {
 		Mstsc.$("main").style.display = 'none';
 		var canvas = Mstsc.$("myCanvas");
 		canvas.style.display = 'inline';
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
-		client.connect(ip, domain, username, password, function (err) {
+		client.connect(ip, organization, domain, username, password, function (err) {
 			Mstsc.$("myCanvas").style.display = 'none';
 			Mstsc.$("main").style.display = 'inline';
 		});
@@ -46,10 +46,12 @@
   <body onload='load("myCanvas")'>
 
     <div id="main" class="container">
-		<form class="form-signin"  onSubmit="connect(this.elements['inputIpAddress'].value, this.elements['inputDomain'].value, this.elements['inputUsername'].value, this.elements['inputPassword'].value);return false;">
+		<form class="form-signin"  onSubmit="connect(this.elements['inputIpAddress'].value, this.elements['inputOrganization'].value, this.elements['inputDomain'].value, this.elements['inputUsername'].value, this.elements['inputPassword'].value);return false;">
 			<img class='logo' src="./img/mstsc.js.svg"></img>
 			<label for="inputIpAddress" class="sr-only">IP Address</label>
 			<input type="text" id="inputIpAddress" class="form-control" placeholder="IP Address" required autofocus>
+			<label for="inputOrganization" class="sr-only">Organization</label>
+			<input type="text" id="inputOrganization" class="form-control" placeholder="Organization">
 			<label for="inputDomain" class="sr-only">Domain</label>
 			<input type="text" id="inputDomain" class="form-control" placeholder="Domain">
 			<label for="inputUsername" class="sr-only">Username</label>

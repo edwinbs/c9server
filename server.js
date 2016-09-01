@@ -19,12 +19,25 @@
 
 var express = require('express');
 var http = require('http');
+var bodyParser = require('body-parser');
 
 var app = express();
-app.use(express.static(__dirname + '/client'))
+
+// parse application/json
+app.use(bodyParser.json());
+
+app.use(express.static(__dirname + '/client'));
 app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/client/html/index.html');
 });
+
+app.use(express.static(__dirname + '/management'));
+app.get('/management', function(req, res) {
+	res.sendFile(__dirname + '/management/index.html');
+});
+
+app.use(require('./controllers'));
+
 var server = http.createServer(app).listen(process.env.PORT || 9250);
 
 require('./server/mstsc')(server);

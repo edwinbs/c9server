@@ -21,6 +21,7 @@ var rdp = require('../rdp/rdp');
 var TokenStorage = require('../storage/tokenStorage');
 
 var tunnels = {};
+var tunnelsById = {};
 
 function getTunnel(organization, ip) {
 	if (!organization || !ip || !tunnels[organization]) {
@@ -50,20 +51,35 @@ module.exports = function (server) {
 	var io = require('socket.io')(server);
 	io.on('connection', function(client) {
 		if (client.handshake.query.isAgent == "true") {
+			var tunnelId = client.id;
 			var agentToken = client.handshake.query.agentToken;
 
 			var tunnelConfig = TokenStorage.getTunelConfigForToken(agentToken);
 			if (!tunnelConfig || !tunnelConfig.organization || !tunnelConfig.ipRange) {
-				client.emit('connection_failed');
+				client.emit('connection_failed', 'Token not registered');
 				console.log('[agent_connect] Token not registered');
 			} else {
 				if (!tunnels[tunnelConfig.organization]) {
 					tunnels[tunnelConfig.organization] = {};
 				}
 
+				var existingTunnel = tunnels[tunnelConfig.organization][tunnelConfig.ipRange];
+				if (existingTunnel) {
+					existingTunnel.disconnect();
+				}
+
 				tunnels[tunnelConfig.organization][tunnelConfig.ipRange] = client;
+
 				client.emit('connection_succeed');
 				console.log('[agent_connect] Tunnel for ' + tunnelConfig.organization + ' with ip range ' + tunnelConfig.ipRange + ' connected');
+
+				client.on('disconnect', function() {
+					var curTunnel = tunnels[tunnelConfig.organization][tunnelConfig.ipRange];
+					if (curTunnel.id === tunnelId) {
+						console.log('[agent_disconnect] Removed tunnel record for ' + tunnelConfig.organization + ' with ip range ' + tunnelConfig.ipRange);
+						tunnels[tunnelConfig.organization][tunnelConfig.ipRange] = null;
+					}
+				});
 			}
 		} else {
 			var rdpClient = null;

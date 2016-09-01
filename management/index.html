@@ -34,10 +34,18 @@
 			<button class="btn btn-primary" onClick="registerAgent()">Register</button>
 		</div>
     </div>
-    <div id="token-container" class="token-container" style="display: none">
-    	<div class="token-display">
-    		<h1 id="agent-token"></h1>
-    	</div>
-    </div>
+    <div id="token-list-container" class="token-list-container">
+		<div class="row token-list-row">
+			<h3>32132131</h3>
+			<p>192.168.186.*</p>
+			<p>IBM</p>
+			<button class="btn btn-primary" onclick="removeToken(32132131)">Remove</button>
+		</div>
+	</div>
+	<div id="token-container" class="token-container" style="display: none">
+		<div id="token-display" class="token-display">
+			<h1 id="agent-token"></h1>
+		</div>
+	</div>
   </body>
 </html>

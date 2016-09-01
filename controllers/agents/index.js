@@ -9,19 +9,27 @@ router.post('/', function(req, res, next) {
 	var token = Math.floor((Math.random() * 100000000) + 1);
 
 	TokenStorage.registerToken(token, ipRange, organization);
-	res.status(200).send({token: token});
+	res.status(200).json({token: token});
 });
 
 router.get('/', function(req, res) {
-	res.status(200).send(TokenStorage.getAll());
+	res.status(200).json(TokenStorage.getAll());
 });
 
 router.get('/:token', function(req, res) {
 	var config = TokenStorage.getTunelConfigForToken(req.params.token);
 	if (config) {
-		res.status(200).send(config);
+		res.status(200).json(config);
 	} else {
-		res.status(400).send({err: "Token not registered"});
+		res.status(400).json({err: "Token not registered"});
+	}
+});
+
+router.delete('/:token', function(req, res) {
+	if (TokenStorage.deleteConfigForToken(req.params.token)) {
+		res.status(200).end();
+	} else {
+		res.status(400).json({error: 'tokenNotExist'});
 	}
 });
 

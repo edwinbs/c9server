@@ -1,11 +1,24 @@
 body {
   overflow:hidden;
+  background: url('../img/cloud.jpg') no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  height: 100%;
+}
+
+.container {
+  margin-top: 30px;
 }
 
 .form-signin {
-  max-width: 330px;
-  padding: 15px;
+  margin-top: 20px;
+  max-width: 500px;
+  padding: 20px 40px;
   margin: 0 auto;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.85);
 }
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
@@ -16,6 +29,7 @@ body {
 }
 .form-signin .form-control {
   position: relative;
+  margin-top:5px;
   height: auto;
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="./img/favicon.ico">
+    <script type="text/javascript" src="./js/lib/jquery-2.2.4.min.js"></script>
+
+    <title>Component 9 Management</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="./css/management.css" rel="stylesheet">
+
+	<script type="text/javascript" src="./js/management.js"></script>
+
+  </head>
+
+  <body>
+
+    <div id="main" class="container">
+		<div class="agent-register-container">
+			<h3>Register an agent</h3>
+			<br/>
+			<label for="inputIpRange" class="sr-only">IP Range</label>
+			<input id="ip-range" type="text" id="inputIpRange" class="form-control" placeholder="IP Range" required autofocus>
+			<label for="inputOrganization" class="sr-only">Organization</label>
+			<input id="organization" type="text" id="inputOrganization" class="form-control" placeholder="Organization">
+			<br/>
+			<button class="btn btn-primary" onClick="registerAgent()">Register</button>
+		</div>
+    </div>
+    <div id="token-container" class="token-container" style="display: none">
+    	<div class="token-display">
+    		<h1 id="agent-token"></h1>
+    	</div>
+    </div>
+  </body>
+</html>

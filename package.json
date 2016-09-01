@@ -19,6 +19,7 @@
     "express": "4.13.x",
     "lodash": "3.3.0",
     "socket.io": "1.3.x",
+    "socket.io-client": "^1.4.8",
     "starttls": "^1.0.0"
   },
   "scripts": {

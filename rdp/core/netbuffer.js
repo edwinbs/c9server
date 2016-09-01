@@ -185,7 +185,7 @@ BufferLayer.prototype.listenTLS = function(keyFilePath, crtFilePath, callback) {
  * Connect to target
  */
 BufferLayer.prototype.connect = function(port, host, callback) {
-	return this.socket.connect(port, host, callback);
+	this.socket.connect(port, host, callback);
 };
 
 /**

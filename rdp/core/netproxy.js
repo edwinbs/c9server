@@ -1,62 +1,105 @@
 'use strict';
 
 var inherits = require('util').inherits;
-var events = require('events');
 var net = require('net');
+var events = require('events');
 
-var netbuffer = require('./netbuffer');
-
-function NetworkProxy(tunnel) {
-	console.log('Using network proxy');
-
-	this.bufferLayer = new netbuffer.BufferLayer(new net.Socket());
+function NetProxy(tunnel) {
+	this.tunnel = tunnel;
 	var self = this;
-	this.bufferLayer.on('data', function(s) {
-		self.emit('data', s);
-	}).on('close', function() {
-		self.emit('close');
-	}).on('error', function(err) {
-		self.emit('error', err);
+	this.tunnel.on('rdpc-close', function(data) {
+		self.emit('close', data.data);
+	}).on('rdpc-connect', function(data) {
+		self.emit('connection', data.data);
+	}).on('rdpc-data', function(data) {
+		self.emit('data', data.data);
+	}).on('rdpc-drain', function(data) {
+		self.emit('drain', data.data);
+	}).on('rdpc-end', function(data) {
+		self.emit('end', data.data);
+	}).on('rdpc-error', function(data) {
+		self.emit('error', data.data);
+	}).on('rdpc-lookup', function(data) {
+		self.emit('lookup', data.data);
+	}).on('rdpc-timeout', function(data) {
+		self.emit('timeout', data.data);
 	});
 }
 
-inherits(NetworkProxy, events.EventEmitter);
+inherits(NetProxy, events.EventEmitter);
 
-NetworkProxy.prototype.recv = function(data) {
-	console.log('[proxy] recv()');
-	return this.bufferLayer.recv(data);
-}
+NetProxy.prototype.address = function() {
+	this.tunnel.emit('rdp-address');
+};
 
-NetworkProxy.prototype.send = function(data) {
-	console.log('[proxy] send()');
-	return this.bufferLayer.send(data);
-}
+NetProxy.prototype.connect = function(options, connectListener) {
+	this.tunnel.on('rdpc-connect-callback-1', function() {
+		connectListener();
+	});
+	this.tunnel.emit('rdp-connect-1', {options: options});
+};
 
-NetworkProxy.prototype.connect = function(port, host, callback) {
-	console.log('[proxy] connect()');
-	return this.bufferLayer.socket.connect(port, host, callback);
-}
+NetProxy.prototype.connect = function(port, host, connectListener) {
+	this.tunnel.on('rdpc-connect-callback-2', function() {
+		connectListener();
+	});
+	this.tunnel.emit('rdp-connect-2', {port: port, host: host});
+};
 
-NetworkProxy.prototype.expect = function(expectedSize) {
-	console.log('[proxy] expect()');
-	return this.bufferLayer.expect(expectedSize);
-}
+NetProxy.prototype.destroy = function(exception) {
+	this.tunnel.emit('rdp-destroy', {exception: exception});
+};
 
-NetworkProxy.prototype.startTLS = function(callback) {
-	console.log('[proxy] startTLS()');
-	return this.bufferLayer.startTLS(callback);
-}
+NetProxy.prototype.end = function(data, encoding) {
+	this.tunnel.emit('rdp-end', {data: data, encoding: encoding});
+};
 
-NetworkProxy.prototype.listenTLS = function(keyFilePath, crtFilePath, callback) {
-	console.log('[proxy] listenTLS()');
-	return this.bufferLayer.listenTLS(keyFilePath, crtFilePath, callback);
-}
+NetProxy.prototype.pause = function() {
+	this.tunnel.emit('rdp-pause');
+};
 
-NetworkProxy.prototype.close = function() {
-	console.log('[proxy] close()');
-	return this.bufferLayer.close();
-}
+NetProxy.prototype.ref = function() {
+	this.tunnel.emit('rdp-ref');
+};
+
+NetProxy.prototype.resume = function() {
+	this.tunnel.emit('rdp-resume');
+};
+
+NetProxy.prototype.setEncoding = function(encoding) {
+	this.tunnel.emit('rdp-setencoding', {encoding: encoding});
+};
+
+NetProxy.prototype.setKeepAlive = function(enable, initialDelay) {
+	this.tunnel.emit('rdp-setkeepalive', {enable: enable, initialDelay: initialDelay});
+};
+
+NetProxy.prototype.setNoDelay = function(noDelay) {
+	this.tunnel.emit('rdp-setnodelay', {noDelay: noDelay});
+};
+/*
+NetProxy.prototype.setTimeout = function(timeout, callback) {
+	this.impl.setTimeout(timeout, callback);
+};
+*/
+NetProxy.prototype.unref = function() {
+	this.tunnel.emit('rdp-unref');
+};
+
+NetProxy.prototype.write = function(data, encoding, callback) {
+	this.tunnel.on('rdpc-write-callback', function() {
+		if (callback) callback();
+	});
+	this.tunnel.emit('rdp-write', {data: data, encoding: encoding});
+};
+
+NetProxy.prototype.pipe = function(socket) {
+	this.tunnel.on('rdpc-data', function(data) {
+		socket.write(data.data);
+	});
+	this.tunnel.on('rdpc-end', socket.end);
+};
 
 module.exports = {
-	BufferLayer: NetworkProxy
+	Socket : NetProxy
 };

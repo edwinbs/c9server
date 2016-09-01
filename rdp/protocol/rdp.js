@@ -83,11 +83,13 @@ function decompress (bitmap) {
 function RdpClient(config) {
 	config = config || {};
 	this.connected = false;
+	var socketImpl;
 	if (config.tunnel) {
-		this.bufferLayer = new netproxy.BufferLayer(config.tunnel);
+		socketImpl = new netproxy.Socket(config.tunnel);
 	} else {
-		this.bufferLayer = new netbuffer.BufferLayer(new net.Socket());
+		socketImpl = new net.Socket();
 	}
+	this.bufferLayer = new netbuffer.BufferLayer(socketImpl);
 	this.tpkt = new TPKT(this.bufferLayer);
 	this.x224 = new x224.Client(this.tpkt);
 	this.mcs = new t125.mcs.Client(this.x224);

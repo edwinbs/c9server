@@ -47,9 +47,9 @@ var TunnelStorage = {
 		if (tunnels[organization] && tunnels[organization][ipRange]) {
 			tunnels[organization][ipRange].emit('rdp-destroy', {exception: null});
 			tunnels[organization][ipRange].disconnect();
-		}
 
-		delete tunnels[organization][ipRange];
+			delete tunnels[organization][ipRange];
+		}
 	}
 }
 

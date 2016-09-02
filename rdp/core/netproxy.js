@@ -7,6 +7,8 @@ var events = require('events');
 function NetProxy(tunnel) {
 	this.tunnel = tunnel;
 	var self = this;
+	this.tunnel.removeAllListeners('rdpc-data');
+	this.tunnel.removeAllListeners('rdpc-end');
 	this.tunnel.on('rdpc-close', function(data) {
 		self.emit('close', data.data);
 	}).on('rdpc-connect', function(data) {

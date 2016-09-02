@@ -68,7 +68,7 @@ function initSocket() {
   });
 
   socket.on('rdp-connect-2', function(data) {
-    impl.connect(data.port, data.host, function() {
+    impl.connect(data.port, data.host, function(err, data) {
       socket.emit('rdpc-connect-callback-2');
     });
   });

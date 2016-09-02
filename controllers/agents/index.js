@@ -1,5 +1,6 @@
 var express = require('express');
 var TokenStorage = require('../../storage/tokenStorage');
+var TunnelStorage = require('../../storage/tunnelStorage');
 
 var router = express.Router();
 
@@ -26,7 +27,9 @@ router.get('/:token', function(req, res) {
 });
 
 router.delete('/:token', function(req, res) {
+	var config = TokenStorage.getTunelConfigForToken(req.params.token);
 	if (TokenStorage.deleteConfigForToken(req.params.token)) {
+		TunnelStorage.removeTunnel(config.organization, config.ipRange);
 		res.status(200).end();
 	} else {
 		res.status(400).json({error: 'tokenNotExist'});

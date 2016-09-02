@@ -19,29 +19,9 @@
 
 var rdp = require('../rdp/rdp');
 var TokenStorage = require('../storage/tokenStorage');
+var TunnelStorage = require('../storage/tunnelStorage');
 
-var tunnels = {};
 var tunnelsById = {};
-
-function getTunnel(organization, ip) {
-	if (!organization || !ip || !tunnels[organization]) {
-		console.log('Tunnel not found');
-		return null;
-	}
-
-	var orgTunnels = tunnels[organization];
-	for (var key in orgTunnels) {
-		if (orgTunnels.hasOwnProperty(key)) {
-			if (ip.indexOf(key.substring(0, key.indexOf('*'))) === 0) {
-				console.log('Tunnel for ' + organization + ' with ip range ' + key + ' found');
-				return orgTunnels[key];
-			}
-		}
-	}
-
-	console.log('Tunnel not found');
-	return null;
-}
 
 /**
  * Create proxy between rdp layer and socket io
@@ -59,25 +39,16 @@ module.exports = function (server) {
 				client.emit('connection_failed', 'Token not registered');
 				console.log('[agent_connect] Token not registered');
 			} else {
-				if (!tunnels[tunnelConfig.organization]) {
-					tunnels[tunnelConfig.organization] = {};
-				}
-
-				var existingTunnel = tunnels[tunnelConfig.organization][tunnelConfig.ipRange];
-				if (existingTunnel) {
-					existingTunnel.disconnect();
-				}
-
-				tunnels[tunnelConfig.organization][tunnelConfig.ipRange] = client;
+				TunnelStorage.addTunnel(tunnelConfig.organization, tunnelConfig.ipRange, client);
 
 				client.emit('connection_succeed');
 				console.log('[agent_connect] Tunnel for ' + tunnelConfig.organization + ' with ip range ' + tunnelConfig.ipRange + ' connected');
 
 				client.on('disconnect', function() {
-					var curTunnel = tunnels[tunnelConfig.organization][tunnelConfig.ipRange];
+					var curTunnel = TunnelStorage.getTunnel(tunnelConfig.organization, tunnelConfig.ipRange);
 					if (curTunnel.id === tunnelId) {
 						console.log('[agent_disconnect] Removed tunnel record for ' + tunnelConfig.organization + ' with ip range ' + tunnelConfig.ipRange);
-						tunnels[tunnelConfig.organization][tunnelConfig.ipRange] = null;
+						TunnelStorage.removeTunnel(tunnelConfig.organization, tunnelConfig.ipRange);
 					}
 				});
 			}
@@ -89,7 +60,7 @@ module.exports = function (server) {
 					rdpClient.close();
 				};
 
-				var tunnel = getTunnel(infos.organization, infos.ip);
+				var tunnel = TunnelStorage.findTunnel(infos.organization, infos.ip);
 				console.log('[main] tunnel=' + tunnel);
 				
 				rdpClient = rdp.createClient({

@@ -59,9 +59,9 @@ body {
   padding: 15px;
   width: 300px;
   background: white;
-  -ms-transform: translate(290px, 0px); /* IE 9 */
-  -webkit-transform: translate(290px, 0px); /* Safari */
-  transform: translate(290px, 0px);
+  -ms-transform: translate(280px, 0px); /* IE 9 */
+  -webkit-transform: translate(280px, 0px); /* Safari */
+  transform: translate(280px, 0px);
   -webkit-transition: transform 0.5s; /* Safari */
   transition: transform 0.5s;
 }
